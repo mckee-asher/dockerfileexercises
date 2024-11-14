@@ -1,0 +1,12 @@
+pipeline {
+    agent any
+    stages {
+        stage("Run Script") {
+            steps {
+                dir("Task2") {
+                    sh "deploy.sh"
+                }
+            }
+        }
+    }
+}
