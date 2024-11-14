@@ -1,7 +1,7 @@
 pipeline {
     environment {
         MYSQL_ROOT_PASSWORD = credentials("MYSQL_ROOT_PASSWORD")
-        DOCKER_HUB = credentials("DOCKERHUB_CREDENTIALS")
+        DOCKERHUB_CREDENTIALS = credentials("DOCKERHUB_CREDENTIALS")
         APP_NAME = "flask app"
     }
     agent any
@@ -9,23 +9,31 @@ pipeline {
         stage("Build MySQL") {
             steps {
                 dir("Task2") {
-                    sh "docker build -t trip-task-myswl:5.7 db"
+                    sh "docker build -t ${DOCKERHUB_CREDENTIALS_USR}/trip-task-mysql:5.7 db"
                 }
             }
         }
         stage("Build Flask App") {
             steps {
                 dir("Task2") {
-                    sh "docker build -t trio-task-flask-app:latest flask-app"
+                    sh "docker build -t ${DOCKERHUB_CREDENTIALS_USR}trio-task-flask-app:latest flask-app"
                 }
             }
         }
-        stage("Deploy Containers") {
+
+        stage("Push Images") {
             steps {
-                dir("Task2") {
-                    sh "sh deploy.sh"
-                }
+                sh "docker login -u ${DOCKERHUB_CREDENTIALS_USR} -p ${DOCKERHUB_CREDENTIALS_PSW}"
+                sh "docker push ${DOCKERHUB_CREDENTIALS_USR}trio-task-flask-app:latest"
+                sh "docker push ${DOCKERHUB_CREDENTIALS_USR}/trip-task-mysql:5.7"
+                sh "docker logout"
             }
+        }
+    }
+    post {
+        always {
+            sh "docker rm -f \$(docker ps -aq) || sleep 1"
+            sh "docker system prune"
         }
     }
 }

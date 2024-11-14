@@ -7,13 +7,13 @@ docker run -d \
     -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
     --name mysql \
     --network trio-task-network \
-    trio-task-mysql:5.7
+    ${DOCKERHUB_CREDENTIALS_USR}trio-task-mysql:5.7
 
 docker run -d \
     -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
     --name flask-app \
     --network trio-task-network \
-    trio-task-flask-app:latest
+    ${DOCKERHUB_CREDENTIALS_USR}trio-task-flask-app:latest
 
 docker run -d \
     --name nginx \
