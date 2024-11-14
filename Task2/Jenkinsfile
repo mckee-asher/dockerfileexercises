@@ -1,48 +1,33 @@
 pipeline {
     environment {
         MYSQL_ROOT_PASSWORD = credentials("MYSQL_ROOT_PASSWORD")
-        DOCKER_HUB = credentials("b16ef511-4cfd-4537-93b3-106656f2a519")
+        DOCKER_HUB = credentials("DOCKERHUB_CREDENTIALS")
         APP_NAME = "flask app"
     }
     agent any
     stages {
-        stage("Set up") {
+        stage("Build MySQL") {
             steps {
                 dir("Task2") {
-                    sh "sh deploy_set_up.sh"
+                    sh "docker build -t trip-task-myswl:5.7 db"
                 }
             }
         }
-        stage("Create database") {
+        stage("Build Flask App") {
             steps {
                 dir("Task2") {
-                    sh "sh deploy_mysql.sh"
+                    sh "docker build -t trio-task-flask-app:latest flask-app"
                 }
             }
         }
-        stage("Create flask app") {
+        stage("Deploy Containers") {
             steps {
                 dir("Task2") {
-                    sh "sh deploy_flask.sh"
+                    sh "sh deploy.sh"
                 }
             }
-        }
-        stage("Show containers") {
-            steps {
-                sh "docker ps -a"
-                sh "docker images"
-            }
-        }
-        stage("Push to DockerHub") {
-            steps {
-                sh 'docker push amckee457/$APP_NAME'
-            }
-        }
-    }
-    post {
-        success {
-            echo "success"
         }
     }
 }
+        
 
