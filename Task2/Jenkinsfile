@@ -2,7 +2,7 @@ pipeline {
     environment {
         MYSQL_ROOT_PASSWORD = credentials("MYSQL_ROOT_PASSWORD")
         DOCKER_HUB = credentials("b16ef511-4cfd-4537-93b3-106656f2a519")
-        APP_NAME = "amckee457/dockerfileexercises"
+        APP_NAME = "flask app"
     }
     agent any
     stages {
@@ -35,7 +35,7 @@ pipeline {
         }
         stage("Push to DockerHub") {
             steps {
-                sh 'docker push $APP_NAME'
+                sh 'docker push amckee457/$APP_NAME'
             }
         }
     }
