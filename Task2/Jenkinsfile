@@ -1,15 +1,41 @@
 pipeline {
     environment {
-        MYSQL_ROOT_PASSWORD=("MYSQL_ROOT_PASSWORD")
+        MYSQL_ROOT_PASSWORD = credentials("MYSQL_ROOT_PASSWORD")
+        DOCKER_HUB = credentials("b16ef511-4cfd-4537-93b3-106656f2a519")
     }
     agent any
     stages {
-        stage("Run Script") {
+        stage("Set up") {
             steps {
                 dir("Task2") {
-                    sh "sh deploy.sh"
+                    sh "sh deploy_set_up.sh"
                 }
             }
         }
+        stage("Create database") {
+            steps {
+                dir("Task2") {
+                    sh "sh deploy_mysql.sh"
+                }
+            }
+        }
+        stage("Create flask app") {
+            steps {
+                dir("Task2") {
+                    sh "sh deploy_flask.sh"
+                }
+            }
+        }
+        stage("Show containers") {
+            steps {
+                sh "docker ps -a"
+            }
+        }
+    }
+    post {
+        success {
+            echo "success"
+        }
     }
 }
+
